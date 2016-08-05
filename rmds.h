@@ -18,7 +18,7 @@ typedef enum
 class Crmds
 {
   public:
-    Crmds(uint8_t temp_can_ID);
+    Crmds(uint8_t temp_machine_ID);
     void reset();
     void set_mode(rmds_mode_e temp_mode);
     void set_pwm(int16_t temp_pwm);             //-5000~5000
