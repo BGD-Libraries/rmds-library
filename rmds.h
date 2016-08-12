@@ -26,7 +26,7 @@ class Crmds
     void set_velocity(int16_t temp_velocity);   //RPM 
     void set_position(int32_t temp_position);   //qc
     void write_data(uint32_t *temp_can_ID, uint8_t temp_tx_data[]);
-    void read_data(uint32_t *temp_can_ID, uint8_t temp_rx_data[]);
+    bool read_data(uint32_t *temp_can_ID, uint8_t temp_rx_data[]);
     int16_t get_real_current();
     int16_t get_real_velocity();
     int32_t get_real_position();

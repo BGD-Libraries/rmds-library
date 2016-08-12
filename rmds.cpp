@@ -281,14 +281,16 @@ void Crmds::write_data(uint32_t *temp_can_ID, uint8_t temp_tx_data[])
     }
 }
 
-void Crmds::read_data(uint32_t *temp_can_ID, uint8_t temp_rx_data[])
+bool Crmds::read_data(uint32_t *temp_can_ID, uint8_t temp_rx_data[])
 {
     if (*temp_can_ID == ((machine_ID <<4)|DRV_RETURN_ID) ) {
         last_rx_time = millis();
         real_current =  (((uint16_t)temp_rx_data[0]<<8)|(uint16_t)temp_rx_data[1]);
         real_velocity = (((uint16_t)temp_rx_data[2]<<8)|(uint16_t)temp_rx_data[3]);
         real_position = (((uint32_t)temp_rx_data[4]<<24)|((uint32_t)temp_rx_data[5]<<16)|((uint32_t)temp_rx_data[6]<<8)|(uint32_t)temp_rx_data[7]);
+        return true;
     }
+    return false;
 }
 
 int16_t Crmds::get_real_current()
