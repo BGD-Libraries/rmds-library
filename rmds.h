@@ -22,8 +22,8 @@ class Crmds
     void reset();
     void set_mode(rmds_mode_e temp_mode);
     void set_pwm(int16_t temp_pwm);             //-5000~5000
-    void set_current(int16_t temp_current);     //AM  
-    void set_velocity(int16_t temp_velocity);   //RPM 
+    void set_current(int16_t temp_current);     //mA
+    void set_velocity(int16_t temp_velocity);   //RPM
     void set_position(int32_t temp_position);   //qc
     void write_data(uint32_t *temp_can_ID, uint8_t temp_tx_data[]);
     bool read_data(uint32_t *temp_can_ID, uint8_t temp_rx_data[]);

@@ -2,8 +2,6 @@
 #include <mcp_can.h>
 #include <SPI.h>
 
-#define MAX_VELOCITY 5000
-
 /*CAN 配置*/
 const int SPI_CS_pin = 40;
 MCP_CAN CAN(SPI_CS_pin);
@@ -46,7 +44,7 @@ void setup()
 	CAN.sendMsgBuf(CAN_ID, 0, 8, can_tx_data);
 	delay(500);  //设置模式后需要等待500ms
 
-	for (int x=0;x<=5000;x++) {
+	for (int x=0;x<=5000;x++) {	//PWM最大值5000
 		motor1.set_pwm(x);
 		motor1.write_data(&CAN_ID, can_tx_data);
 		CAN.sendMsgBuf(CAN_ID, 0, 8, can_tx_data);
