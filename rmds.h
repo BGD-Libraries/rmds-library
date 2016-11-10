@@ -27,6 +27,8 @@ class Crmds
     void set_position(int32_t temp_position);   //qc
     void write_data(uint32_t *temp_can_ID, uint8_t temp_tx_data[]);
     bool read_data(uint32_t *temp_can_ID, uint8_t temp_rx_data[]);
+    void send_data(void);
+    int8_t register_callBack(void (*callBackfun)(uint32_t *, uint8_t *));
     int16_t get_real_current();
     int16_t get_real_velocity();
     int32_t get_real_position();
@@ -45,5 +47,6 @@ class Crmds
     int32_t real_position;
     unsigned long last_rx_time;
     uint8_t return_time;
+    void (*send)(uint32_t *, uint8_t *);
 };
 #endif //_RMDS_H_

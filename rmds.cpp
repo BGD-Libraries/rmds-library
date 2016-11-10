@@ -293,6 +293,22 @@ bool Crmds::read_data(uint32_t *temp_can_ID, uint8_t temp_rx_data[])
     return false;
 }
 
+void Crmds::send_data(void)
+{
+    if (send == NULL)
+        return;
+    uint32_t can_ID;
+    uint8_t tx_data[8];
+    Crmds::write_data(&can_ID, tx_data);
+    send(&can_ID, tx_data);
+}
+
+int8_t Crmds::register_callBack(void (*callBackfun)(uint32_t *, uint8_t *))
+{
+    send = callBackfun;
+
+}
+
 int16_t Crmds::get_real_current()
 {
     return real_current;
