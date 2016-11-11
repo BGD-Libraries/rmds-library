@@ -33,7 +33,7 @@ void setup()
 		}
 	}
 	//注册回调函数
-	motor1.register_callBack(can_send_call_back);
+	motor1.register_callback(can_send_call_back);
 
 	/*电机驱动板初始化*/
 	motor1.reset();

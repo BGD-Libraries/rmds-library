@@ -1,5 +1,6 @@
 #include "rmds.h"
 #include "rmds_dfs.h"
+#include <assert.h>
 Crmds::Crmds(uint8_t temp_machine_ID)
 {
     machine_ID = temp_machine_ID;
@@ -295,15 +296,14 @@ bool Crmds::read_data(uint32_t *temp_can_ID, uint8_t temp_rx_data[])
 
 void Crmds::send_data(void)
 {
-    if (send == NULL)
-        return;
+    assert(send != NULL);
     uint32_t can_ID;
     uint8_t tx_data[8];
     Crmds::write_data(&can_ID, tx_data);
     send(&can_ID, tx_data);
 }
 
-int8_t Crmds::register_callBack(void (*callBackfun)(uint32_t *, uint8_t *))
+int8_t Crmds::register_callback(void (*callBackfun)(uint32_t *, uint8_t *))
 {
     send = callBackfun;
 
