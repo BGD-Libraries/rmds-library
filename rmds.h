@@ -4,7 +4,7 @@
 
 typedef enum
 {
-    ENTER_RESET_MODE                     = 0x00,
+    ENTER_NULL_MODE                      = 0x00,
     ENTER_PWM_MODE                       = 0x01,
     ENTER_PWM_CURRENT_MODE               = 0x02,
     ENTER_PWM_VELOCITY_MODE              = 0x03,
@@ -20,6 +20,7 @@ class Crmds
   public:
     Crmds(uint8_t temp_machine_ID);
     void reset();
+    void autoSend(bool flag);
     void set_mode(rmds_mode_e temp_mode);
     void set_pwm(int16_t temp_pwm);             //-5000~5000
     void set_current(int16_t temp_current);     //mA
@@ -38,6 +39,7 @@ class Crmds
     uint8_t machine_ID;
     uint32_t can_ID;
     rmds_mode_e mode;
+    bool autoSendFlag;
     int16_t pwm;
     int16_t current;
     int16_t velocity;

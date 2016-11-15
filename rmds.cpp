@@ -1,15 +1,23 @@
 #include "rmds.h"
 #include "rmds_dfs.h"
-#include <assert.h>
+
 Crmds::Crmds(uint8_t temp_machine_ID)
 {
     machine_ID = temp_machine_ID;
+    autoSendFlag = false;
 }
 
 void Crmds::reset()
 {
     can_ID = ((machine_ID <<4)|DRV_RESET_ID);
-    mode = ENTER_RESET_MODE;
+    mode = ENTER_NULL_MODE;
+    if (autoSendFlag == true)
+        Crmds::send_data();
+}
+
+void Crmds::autoSend(bool flag)
+{
+    autoSendFlag = flag;
 }
 
 void Crmds::set_mode(rmds_mode_e temp_mode)
@@ -65,61 +73,141 @@ void Crmds::set_mode(rmds_mode_e temp_mode)
         position = 0;
     }
 
-
+    if (autoSendFlag == true)
+        Crmds::send_data();
 }
 
 void Crmds::set_pwm(int16_t temp_pwm)
 {
-    if (mode == ENTER_PWM_MODE) {
-        pwm = constrain(temp_pwm, -5000, 5000); 
+    switch (mode) {
+        case ENTER_PWM_MODE:
+            can_ID = ((machine_ID <<4)|DRV_PWM_MODE_ID);
+            pwm = constrain(temp_pwm, -5000, 5000);
+            break;
+
+        case ENTER_PWM_CURRENT_MODE:
+            can_ID = ((machine_ID <<4)|DRV_PWM_CURRENT_MODE_ID);
+            pwm = constrain(temp_pwm, 0, 5000);
+            break;
+
+        case ENTER_PWM_VELOCITY_MODE:
+            can_ID = ((machine_ID <<4)|DRV_PWM_VELOCITY_MODE_ID);
+            pwm = constrain(temp_pwm, 0, 5000);
+            break;
+
+        case ENTER_PWM_POSITION_MODE:
+            can_ID = ((machine_ID <<4)|DRV_PWM_POSITION_MODE_ID);
+            pwm = constrain(temp_pwm, 0, 5000);
+            break;
+
+        case ENTER_PWM_VELOCITY_POSITION_MODE:
+            can_ID = ((machine_ID <<4)|DRV_CURRENT_VELOCITY_POSITION_MODE_ID);
+            pwm = constrain(temp_pwm, 0, 5000);
+            break;
+
+        default:
+            break;
     }
-    else if(mode == ENTER_PWM_CURRENT_MODE           ||
-            mode == ENTER_PWM_VELOCITY_MODE          ||
-            mode == ENTER_PWM_POSITION_MODE          ||
-            mode == ENTER_PWM_VELOCITY_POSITION_MODE   )
-    {
-        pwm = constrain(temp_pwm, 0, 5000);
-    }
+    if (autoSendFlag == true)
+        Crmds::send_data();
 }
 
 void Crmds::set_current(int16_t temp_current)
 {
-    if (mode == ENTER_PWM_CURRENT_MODE) {
-        current = temp_current;
+    switch (mode) {
+        case ENTER_PWM_CURRENT_MODE:
+            can_ID = ((machine_ID <<4)|DRV_PWM_CURRENT_MODE_ID);
+            current = temp_current;
+            break;
+
+        case ENTER_CURRENT_VELOCITY_MODE:
+            can_ID = ((machine_ID <<4)|DRV_CURRENT_VELOCITY_MODE_ID);
+            current = constrain(temp_current, 0, 32767);
+            break;
+
+        case ENTER_CURRENT_POSITION_MODE:
+            can_ID = ((machine_ID <<4)|DRV_CURRENT_POSITION_MODE_ID);
+            current = constrain(temp_current, 0, 32767);
+            break;
+
+        case ENTER_CURRENT_VELOCITY_POSITION_MODE:
+            can_ID = ((machine_ID <<4)|DRV_CURRENT_VELOCITY_POSITION_MODE_ID);
+            current = constrain(temp_current, 0, 32767);
+            break;
+
+        default:
+            break;
     }
-    else if (mode == ENTER_CURRENT_VELOCITY_MODE          ||
-             mode == ENTER_CURRENT_POSITION_MODE          ||
-             mode == ENTER_CURRENT_VELOCITY_POSITION_MODE   )
-    {
-        current = constrain(temp_current, 0, 32767);
-    }
+    if (autoSendFlag == true)
+        Crmds::send_data();
 }
 
 void Crmds::set_velocity(int16_t temp_velocity)
 {
-    if (mode == ENTER_PWM_VELOCITY_MODE || mode == ENTER_CURRENT_VELOCITY_MODE) {
-        velocity = temp_velocity;
+    switch (mode) {
+        case ENTER_PWM_VELOCITY_MODE:
+            can_ID = ((machine_ID <<4)|DRV_PWM_VELOCITY_MODE_ID);
+            velocity = temp_velocity;
+            break;
+
+        case ENTER_CURRENT_VELOCITY_MODE:
+            can_ID = ((machine_ID <<4)|DRV_CURRENT_VELOCITY_MODE_ID);
+            velocity = temp_velocity;
+            break;
+
+        case ENTER_PWM_VELOCITY_POSITION_MODE:
+            can_ID = ((machine_ID <<4)|DRV_PWM_VELOCITY_POSITION_MODE_ID);
+            velocity = constrain(temp_velocity, 0, 32767);
+            break;
+
+        case ENTER_CURRENT_VELOCITY_POSITION_MODE:
+            can_ID = ((machine_ID <<4)|DRV_CURRENT_VELOCITY_POSITION_MODE_ID);
+            velocity = constrain(temp_velocity, 0, 32767);
+            break;
+
+        default:
+            break;
     }
-    else if (mode == ENTER_PWM_VELOCITY_POSITION_MODE || mode == ENTER_CURRENT_VELOCITY_POSITION_MODE) {
-        velocity = constrain(temp_velocity, 0, 32767);
-    }
+    if (autoSendFlag == true)
+        Crmds::send_data();
 }
 
 void Crmds::set_position(int32_t temp_position)
 {
-    if (mode == ENTER_PWM_POSITION_MODE              ||
-        mode == ENTER_PWM_VELOCITY_POSITION_MODE     ||
-        mode == ENTER_CURRENT_POSITION_MODE          ||
-        mode == ENTER_CURRENT_VELOCITY_POSITION_MODE )
-    {
-        position = temp_position;
+    switch (mode) {
+        case ENTER_PWM_POSITION_MODE:
+            can_ID = ((machine_ID <<4)|DRV_PWM_POSITION_MODE_ID);
+            position = temp_position;
+            break;
+
+        case ENTER_PWM_VELOCITY_POSITION_MODE:
+            can_ID = ((machine_ID <<4)|DRV_PWM_VELOCITY_POSITION_MODE_ID);
+            position = temp_position;
+            break;
+
+        case ENTER_CURRENT_POSITION_MODE:
+            can_ID = ((machine_ID <<4)|DRV_CURRENT_POSITION_MODE_ID);
+            position = temp_position;
+            break;
+
+        case ENTER_CURRENT_VELOCITY_POSITION_MODE:
+            can_ID = ((machine_ID <<4)|DRV_CURRENT_VELOCITY_POSITION_MODE_ID);
+            position = temp_position;
+            break;
+
+        default:
+            break;
     }
+    if (autoSendFlag == true)
+        Crmds::send_data();
 }
 
 void Crmds::config(uint8_t temp_time)
 {
     can_ID = ((machine_ID <<4)|DRV_CONFIG_ID);
     return_time = temp_time;
+    if (autoSendFlag == true)
+        Crmds::send_data();
 }
 
 /*描述：将tx_buf中的数据复制到temp_tx_data中
@@ -127,8 +215,8 @@ void Crmds::config(uint8_t temp_time)
 */
 void Crmds::write_data(uint32_t *temp_can_ID, uint8_t temp_tx_data[])
 {
+    *temp_can_ID = can_ID;
     if (can_ID == ((machine_ID <<4)|DRV_RESET_ID) ) {
-        *temp_can_ID = can_ID;
         temp_tx_data[0] = 0x55;
         temp_tx_data[1] = 0x55;
         temp_tx_data[2] = 0x55;
@@ -139,7 +227,6 @@ void Crmds::write_data(uint32_t *temp_can_ID, uint8_t temp_tx_data[])
         temp_tx_data[7] = 0x55;
     }
     else if (can_ID == ((machine_ID <<4)|DRV_MODE_CHOICE_ID) ) {
-        *temp_can_ID = can_ID;
         temp_tx_data[0] = mode;
         temp_tx_data[1] = 0x55;
         temp_tx_data[2] = 0x55;
@@ -148,25 +235,8 @@ void Crmds::write_data(uint32_t *temp_can_ID, uint8_t temp_tx_data[])
         temp_tx_data[5] = 0x55;
         temp_tx_data[6] = 0x55;
         temp_tx_data[7] = 0x55;
-        if (mode == ENTER_PWM_MODE)
-            can_ID = ((machine_ID <<4)|DRV_PWM_MODE_ID);
-        else if (mode == ENTER_PWM_CURRENT_MODE)
-            can_ID = ((machine_ID <<4)|DRV_PWM_CURRENT_MODE_ID);
-        else if (mode == ENTER_PWM_VELOCITY_MODE)
-            can_ID = ((machine_ID <<4)|DRV_PWM_VELOCITY_MODE_ID);
-        else if (mode == ENTER_PWM_POSITION_MODE)
-            can_ID = ((machine_ID <<4)|DRV_PWM_POSITION_MODE_ID);
-        else if (mode == ENTER_PWM_VELOCITY_POSITION_MODE)
-            can_ID = ((machine_ID <<4)|DRV_PWM_VELOCITY_POSITION_MODE_ID);
-        else if (mode == ENTER_CURRENT_VELOCITY_MODE)
-            can_ID = ((machine_ID <<4)|DRV_CURRENT_VELOCITY_MODE_ID);
-        else if (mode == ENTER_CURRENT_POSITION_MODE)
-            can_ID = ((machine_ID <<4)|DRV_CURRENT_POSITION_MODE_ID);
-        else if (mode == ENTER_CURRENT_VELOCITY_POSITION_MODE)
-            can_ID = ((machine_ID <<4)|DRV_CURRENT_VELOCITY_POSITION_MODE_ID);
     }
     else if (can_ID == ((machine_ID <<4)|DRV_PWM_MODE_ID) ) {
-        *temp_can_ID = can_ID;
         temp_tx_data[0] = (uint8_t)((pwm>>8)&0xff);
         temp_tx_data[1] = (uint8_t)( pwm    &0xff);
         temp_tx_data[2] = 0x55;
@@ -177,7 +247,6 @@ void Crmds::write_data(uint32_t *temp_can_ID, uint8_t temp_tx_data[])
         temp_tx_data[7] = 0x55;
     }
     else if (can_ID == ((machine_ID <<4)|DRV_PWM_CURRENT_MODE_ID) ) {
-        *temp_can_ID = can_ID;
         temp_tx_data[0] = (uint8_t)((pwm>>8)&0xff);
         temp_tx_data[1] = (uint8_t)( pwm    &0xff);
         temp_tx_data[2] = (uint8_t)((current>>8)&0xff);
@@ -188,7 +257,6 @@ void Crmds::write_data(uint32_t *temp_can_ID, uint8_t temp_tx_data[])
         temp_tx_data[7] = 0x55;
     }
     else if (can_ID == ((machine_ID <<4)|DRV_PWM_VELOCITY_MODE_ID) ) {
-        *temp_can_ID = can_ID;
         temp_tx_data[0] = (uint8_t)((pwm>>8)&0xff);
         temp_tx_data[1] = (uint8_t)( pwm    &0xff);
         temp_tx_data[2] = (uint8_t)((velocity>>8)&0xff);
@@ -199,7 +267,6 @@ void Crmds::write_data(uint32_t *temp_can_ID, uint8_t temp_tx_data[])
         temp_tx_data[7] = 0x55;
     }
     else if (can_ID == ((machine_ID <<4)|DRV_PWM_POSITION_MODE_ID) ) {
-        *temp_can_ID = can_ID;
         temp_tx_data[0] = (uint8_t)((pwm>>8)&0xff);
         temp_tx_data[1] = (uint8_t)( pwm    &0xff);
         temp_tx_data[2] = 0x55;
@@ -210,7 +277,6 @@ void Crmds::write_data(uint32_t *temp_can_ID, uint8_t temp_tx_data[])
         temp_tx_data[7] = (uint8_t)( position     &0xff);
     }
     else if (can_ID == ((machine_ID <<4)|DRV_PWM_VELOCITY_POSITION_MODE_ID) ) {
-        *temp_can_ID = can_ID;
         temp_tx_data[0] = (uint8_t)((pwm>>8)&0xff);
         temp_tx_data[1] = (uint8_t)( pwm    &0xff);
         temp_tx_data[2] = (uint8_t)((velocity>>8)&0xff);
@@ -221,7 +287,6 @@ void Crmds::write_data(uint32_t *temp_can_ID, uint8_t temp_tx_data[])
         temp_tx_data[7] = (uint8_t)( position     &0xff);
     }
     else if (can_ID == ((machine_ID <<4)|DRV_CURRENT_VELOCITY_MODE_ID) ) {
-        *temp_can_ID = can_ID;
         temp_tx_data[0] = (uint8_t)((current>>8)&0xff);
         temp_tx_data[1] = (uint8_t)((current)   &0xff);
         temp_tx_data[2] = (uint8_t)((velocity>>8)&0xff);
@@ -232,7 +297,6 @@ void Crmds::write_data(uint32_t *temp_can_ID, uint8_t temp_tx_data[])
         temp_tx_data[7] = 0x55;
     }
     else if (can_ID == ((machine_ID <<4)|DRV_CURRENT_POSITION_MODE_ID) ) {
-        *temp_can_ID = can_ID;
         temp_tx_data[0] = (uint8_t)((current>>8)&0xff);
         temp_tx_data[1] = (uint8_t)((current)   &0xff);
         temp_tx_data[2] = 0x55;
@@ -243,7 +307,6 @@ void Crmds::write_data(uint32_t *temp_can_ID, uint8_t temp_tx_data[])
         temp_tx_data[7] = (uint8_t)( position     &0xff);
     }
     else if (can_ID == ((machine_ID <<4)|DRV_CURRENT_VELOCITY_POSITION_MODE_ID) ) {
-        *temp_can_ID = can_ID;
         temp_tx_data[0] = (uint8_t)((current>>8)&0xff);
         temp_tx_data[1] = (uint8_t)((current)   &0xff);
         temp_tx_data[2] = (uint8_t)((velocity>>8)&0xff);
@@ -254,7 +317,6 @@ void Crmds::write_data(uint32_t *temp_can_ID, uint8_t temp_tx_data[])
         temp_tx_data[7] = (uint8_t)( position     &0xff);
     }
     else if (can_ID == ((machine_ID <<4)|DRV_CONFIG_ID) ) {
-        *temp_can_ID = can_ID;
         temp_tx_data[0] = return_time;
         temp_tx_data[1] = 0x55;
         temp_tx_data[2] = 0x55;
@@ -263,22 +325,6 @@ void Crmds::write_data(uint32_t *temp_can_ID, uint8_t temp_tx_data[])
         temp_tx_data[5] = 0x55;
         temp_tx_data[6] = 0x55;
         temp_tx_data[7] = 0x55;
-        if (mode == ENTER_PWM_MODE)
-            can_ID = ((machine_ID <<4)|DRV_PWM_MODE_ID);
-        else if (mode == ENTER_PWM_CURRENT_MODE)
-            can_ID = ((machine_ID <<4)|DRV_PWM_CURRENT_MODE_ID);
-        else if (mode == ENTER_PWM_VELOCITY_MODE)
-            can_ID = ((machine_ID <<4)|DRV_PWM_VELOCITY_MODE_ID);
-        else if (mode == ENTER_PWM_POSITION_MODE)
-            can_ID = ((machine_ID <<4)|DRV_PWM_POSITION_MODE_ID);
-        else if (mode == ENTER_PWM_VELOCITY_POSITION_MODE)
-            can_ID = ((machine_ID <<4)|DRV_PWM_VELOCITY_POSITION_MODE_ID);
-        else if (mode == ENTER_CURRENT_VELOCITY_MODE)
-            can_ID = ((machine_ID <<4)|DRV_CURRENT_VELOCITY_MODE_ID);
-        else if (mode == ENTER_CURRENT_POSITION_MODE)
-            can_ID = ((machine_ID <<4)|DRV_CURRENT_POSITION_MODE_ID);
-        else if (mode == ENTER_CURRENT_VELOCITY_POSITION_MODE)
-            can_ID = ((machine_ID <<4)|DRV_CURRENT_VELOCITY_POSITION_MODE_ID);
     }
 }
 
@@ -296,9 +342,8 @@ bool Crmds::read_data(uint32_t *temp_can_ID, uint8_t temp_rx_data[])
 
 void Crmds::send_data(void)
 {
-    assert(send != NULL);
-    uint32_t can_ID;
-    uint8_t tx_data[8];
+    static uint32_t can_ID;
+    static uint8_t tx_data[8];
     Crmds::write_data(&can_ID, tx_data);
     send(&can_ID, tx_data);
 }
@@ -306,7 +351,6 @@ void Crmds::send_data(void)
 int8_t Crmds::register_callback(void (*callBackfun)(uint32_t *, uint8_t *))
 {
     send = callBackfun;
-
 }
 
 int16_t Crmds::get_real_current()

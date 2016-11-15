@@ -1,6 +1,5 @@
 #include "rmds.h"
 #include <mcp_can.h>
-#include <SPI.h>
 
 /*CAN 配置*/
 const int SPI_CS_pin = 40;
