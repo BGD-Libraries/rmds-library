@@ -348,8 +348,10 @@ void Crmds::send_data(void)
     send(&can_ID, tx_data);
 }
 
-int8_t Crmds::register_callback(void (*callBackfun)(uint32_t *, uint8_t *))
+void Crmds::register_callback(void (*callBackfun)(uint32_t *, uint8_t *))
 {
+    if (callBackfun == NULL)
+        return;
     send = callBackfun;
 }
 
