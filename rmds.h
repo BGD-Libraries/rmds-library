@@ -18,7 +18,7 @@ typedef enum
 class Crmds
 {
   public:
-    Crmds(uint8_t temp_machine_ID);
+    Crmds(uint32_t temp_machine_ID);
     void reset();
     void autoSend(bool flag);
     void set_mode(rmds_mode_e temp_mode);
@@ -36,7 +36,7 @@ class Crmds
     unsigned long get_rx_time();
     void config(uint8_t temp_time);
   private:
-    uint8_t machine_ID;
+    uint32_t machine_ID;
     uint32_t can_ID;
     rmds_mode_e mode;
     bool autoSendFlag;

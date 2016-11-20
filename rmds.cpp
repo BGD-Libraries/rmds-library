@@ -1,7 +1,7 @@
 #include "rmds.h"
 #include "rmds_dfs.h"
 
-Crmds::Crmds(uint8_t temp_machine_ID)
+Crmds::Crmds(uint32_t temp_machine_ID)
 {
     machine_ID = temp_machine_ID;
     autoSendFlag = false;
