@@ -14,7 +14,4 @@
 #define DRV_CONFIG_ID                                 0x0a
 #define DRV_RETURN_ID                                 0x0b
 
-
-
-
 #endif //_RMDS_DFS_H_

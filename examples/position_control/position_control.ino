@@ -41,7 +41,7 @@ void setup()
 	delay(500);
 	/*选择PWM-速度-位置模式*/
 	//motor1.set_mode(ENTER_CURRENT_POSITION_MODE);
-	motor1.set_mode(ENTER_PWM_VELOCITY_POSITION_MODE);
+	motor1.set_mode(Crmds::PWM_VELOCITY_POSITION_MODE);
 	motor1.write_data(&CAN_ID, can_tx_data);
 	CAN.sendMsgBuf(CAN_ID, 0, 8, can_tx_data);
 	delay(500);  //设置模式后需要等待500ms

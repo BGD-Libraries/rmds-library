@@ -44,7 +44,7 @@ void setup()
 	motor1.send_data();
 	delay(500);
 	/*选择PWM模式*/
-	motor1.set_mode(ENTER_PWM_MODE);
+	motor1.set_mode(Crmds::PWM_MODE);
 	motor1.send_data();
 	delay(500);  //设置模式后需要等待500ms
 
